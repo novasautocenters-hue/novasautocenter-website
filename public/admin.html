@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard | Nova Auto Center</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f4f6f9;
+}
+
+.header {
+  background: #b91c1c;
+  color: white;
+  padding: 20px 40px;
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logout {
+  background: white;
+  color: #b91c1c;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background: white;
+  padding: 30px 50px;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+  text-align: center;
+  min-width: 200px;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 32px;
+  color: #b91c1c;
+}
+
+.card p {
+  margin: 8px 0 0 0;
+  color: #555;
+  font-weight: 500;
+}
+
+table {
+  width: 100%;
+  background: white;
+  border-collapse: collapse;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+th {
+  background: #b91c1c;
+  color: white;
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.pending {
+  background: #fbbf24;
+  color: black;
+}
+
+.completed {
+  background: #16a34a;
+  color: white;
+}
+
+button.action {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 5px;
+  font-size: 12px;
+}
+
+.complete {
+  background: #16a34a;
+  color: white;
+}
+
+.delete {
+  background: #dc2626;
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  Nova Auto Center — Admin Dashboard
+  <button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+
+  <div class="stats">
+    <div class="card">
+      <h3 id="totalCount">0</h3>
+      <p>Total Bookings</p>
+    </div>
+    <div class="card">
+      <h3 id="pendingCount">0</h3>
+      <p>Pending</p>
+    </div>
+    <div class="card">
+      <h3 id="completedCount">0</h3>
+      <p>Completed</p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Service</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Phone</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="bookingTable"></tbody>
+  </table>
+
+</div>
+
+<script>
+const token = localStorage.getItem("adminToken");
+if (!token) window.location.href = "admin-login.html";
+
+async function loadBookings() {
+  const res = await fetch("/api/bookings", {
+    headers: { Authorization: "Bearer " + token }
+  });
+
+  const bookings = await res.json();
+
+  let total = bookings.length;
+  let pending = bookings.filter(b => b.status === "Pending").length;
+  let completed = bookings.filter(b => b.status === "Completed").length;
+
+  document.getElementById("totalCount").innerText = total;
+  document.getElementById("pendingCount").innerText = pending;
+  document.getElementById("completedCount").innerText = completed;
+
+  const table = document.getElementById("bookingTable");
+  table.innerHTML = "";
+
+  bookings.forEach(b => {
+    table.innerHTML += `
+      <tr>
+        <td>${b.name}</td>
+        <td>${b.service}</td>
+        <td>${b.date}</td>
+        <td>
+          <span class="status-badge ${b.status === 'Completed' ? 'completed' : 'pending'}">
+            ${b.status || "Pending"}
+          </span>
+        </td>
+        <td>${b.phone}</td>
+        <td>
+          ${b.status !== "Completed" ? 
+            `<button class="action complete" onclick="markComplete('${b._id}')">Complete</button>` 
+            : ""
+          }
+          <button class="action delete" onclick="deleteBooking('${b._id}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+async function markComplete(id) {
+  await fetch("http://localhost:55000/api/bookings/" + id + "/complete", {
+    method: "PUT",
+    headers: { Authorization: "Bearer " + token }
+  });
+  loadBookings();
+}
+
+async function deleteBooking(id) {
+  await fetch("/api/bookings/" + id, {
+    method: "DELETE",
+    headers: { Authorization: "Bearer " + token }
+  });
+  loadBookings();
+}
+
+function logout() {
+  localStorage.removeItem("adminToken");
+  window.location.href = "admin-login.html";
+}
+
+loadBookings();
+</script>
+
+</body>
+</html>

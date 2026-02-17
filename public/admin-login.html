@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Login | Nova Auto Center</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:white;
+}
+.box{
+  background:#111;
+  padding:40px;
+  border-radius:10px;
+  width:100%;
+  max-width:400px;
+}
+input{
+  width:100%;
+  padding:12px;
+  margin-bottom:15px;
+  border:none;
+  border-radius:5px;
+}
+button{
+  width:100%;
+  padding:12px;
+  background:#00c853;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
+}
+.error{color:red;text-align:center;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="box">
+<h2>🔐 Admin Login</h2>
+
+<input type="email" id="email" placeholder="Admin Email">
+<input type="password" id="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<div class="error" id="error"></div>
+</div>
+
+<script>
+async function login(){
+  const email=document.getElementById("email").value;
+  const password=document.getElementById("password").value;
+  const error=document.getElementById("error");
+  error.textContent="";
+
+  try{
+    const res=await fetch("/api/login",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({email,password})
+    });
+
+    const data=await res.json();
+
+    if(!res.ok){
+      error.textContent=data.message;
+      return;
+    }
+
+    localStorage.setItem("adminToken",data.token);
+    window.location.href="admin.html";
+
+  }catch(err){
+    error.textContent="Server error.";
+  }
+}
+</script>
+
+</body>
+</html>

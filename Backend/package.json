@@ -1,0 +1,23 @@
+{
+  "name": "nova-auto-center-backend",
+  "version": "1.0.0",
+  "description": "Backend for Nova's Auto Center",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.4",
+    "express": "^4.22.1",
+    "express-session": "^1.19.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.2.0",
+    "nodemailer": "^8.0.1",
+    "uuid": "^13.0.0"
+  }
+}

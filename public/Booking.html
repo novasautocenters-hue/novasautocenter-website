@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Book Service | Nova Auto Center</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f8f8f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 1000px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.1);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+
+.left {
+  background: linear-gradient(135deg, #8b0000, #b91c1c);
+  color: white;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.left h1 {
+  margin: 0 0 20px 0;
+  font-size: 34px;
+  letter-spacing: 1px;
+}
+
+.left p {
+  color: #ffe5e5;
+  line-height: 1.6;
+}
+
+.right {
+  padding: 60px 40px;
+}
+
+.right h2 {
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 24px;
+  color: #8b0000;
+}
+
+form input,
+form select,
+form textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+  border-color: #b91c1c;
+  box-shadow: 0 0 0 3px rgba(185,28,28,0.15);
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  background: #b91c1c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+button:hover {
+  background: #8b0000;
+}
+
+#status {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+@media(max-width: 850px) {
+  .container { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="left">
+    <h1>Nova Auto Center</h1>
+    <p>
+      Precision automotive service. Professional repairs.
+      Trusted technicians. Book your appointment online and
+      experience dealership-level care.
+    </p>
+  </div>
+
+  <div class="right">
+    <h2>Book a Service</h2>
+
+    <form id="bookingForm">
+      <input id="name" type="text" placeholder="Full Name" required />
+      <input id="email" type="email" placeholder="Email Address" required />
+      <input id="phone" type="text" placeholder="Phone Number" required />
+      <input id="carModel" type="text" placeholder="Vehicle Model" />
+      <input id="date" type="date" required />
+
+      <select id="service" required>
+        <option value="">Select Service</option>
+        <option value="Oil Change">Oil Change</option>
+        <option value="Brake Service">Brake Service</option>
+        <option value="Engine Diagnostics">Engine Diagnostics</option>
+        <option value="Transmission Service">Transmission Service</option>
+        <option value="AC Repair">AC Repair</option>
+        <option value="Suspension Repair">Suspension Repair</option>
+        <option value="Wheel Alignment">Wheel Alignment</option>
+        <option value="Battery Replacement">Battery Replacement</option>
+        <option value="General Maintenance">General Maintenance</option>
+      </select>
+
+      <textarea id="message" placeholder="Additional Notes (optional)"></textarea>
+
+      <button type="submit">Confirm Booking</button>
+    </form>
+
+    <p id="status"></p>
+  </div>
+
+</div>
+
+<script>
+const form = document.getElementById("bookingForm");
+const status = document.getElementById("status");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const data = {
+    name: document.getElementById("name").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    carModel: document.getElementById("carModel").value.trim(),
+    service: document.getElementById("service").value,
+    date: document.getElementById("date").value,
+    message: document.getElementById("message").value.trim()
+  };
+
+  status.innerText = "Submitting booking...";
+
+  try {
+    const res = await fetch("/api/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.message);
+
+    status.style.color = "green";
+    status.innerText = "✅ Booking confirmed!";
+    form.reset();
+
+  } catch (err) {
+    status.style.color = "red";
+    status.innerText = err.message || "❌ Booking failed";
+  }
+});
+</script>
+
+</body>
+</html>
