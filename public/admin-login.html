@@ -52,31 +52,33 @@ button{
 </div>
 
 <script>
+const API_BASE = "https://novasautocenter-api.onrender.com";
+
 async function login(){
-  const email=document.getElementById("email").value;
-  const password=document.getElementById("password").value;
-  const error=document.getElementById("error");
-  error.textContent="";
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const error = document.getElementById("error");
+  error.textContent = "";
 
   try{
-    const res=await fetch("/api/login",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({email,password})
+    const res = await fetch(`${API_BASE}/api/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
     });
 
-    const data=await res.json();
+    const data = await res.json();
 
     if(!res.ok){
-      error.textContent=data.message;
+      error.textContent = data.message || "Login failed";
       return;
     }
 
-    localStorage.setItem("adminToken",data.token);
-    window.location.href="admin.html";
+    localStorage.setItem("adminToken", data.token);
+    window.location.href = "admin.html";
 
   }catch(err){
-    error.textContent="Server error.";
+    error.textContent = "Server error.";
   }
 }
 </script>
