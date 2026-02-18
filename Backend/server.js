@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
-const path = require("path");
 
 const app = express();
 
@@ -126,7 +125,6 @@ app.post("/api/bookings", async (req, res) => {
 
     await booking.save();
 
-    /* EMAIL TO CUSTOMER */
     await transporter.sendMail({
       from: `"Nova's Auto Center" <${process.env.EMAIL_USER}>`,
       to: email,
@@ -141,7 +139,6 @@ app.post("/api/bookings", async (req, res) => {
       `,
     });
 
-    /* EMAIL TO ADMIN */
     await transporter.sendMail({
       from: `"Nova's Auto Center" <${process.env.EMAIL_USER}>`,
       to: process.env.ADMIN_EMAIL,
@@ -248,7 +245,7 @@ app.put("/api/bookings/:id/archive", verifyToken, async (req, res) => {
 });
 
 /* ======================
-   DELETE BOOKING (Permanent)
+   DELETE BOOKING
 ====================== */
 app.delete("/api/bookings/:id", verifyToken, async (req, res) => {
   await Booking.findByIdAndDelete(req.params.id);
@@ -263,16 +260,9 @@ app.get("/health", (req, res) => {
 });
 
 /* ======================
-   SERVE FRONTEND (IMPORTANT)
-====================== */
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-/* ======================
    SERVER START
 ====================== */
-const PORT = process.env.PORT || 55000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log(`🚀 Server running at http://localhost:${PORT}`)
 );
