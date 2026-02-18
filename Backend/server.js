@@ -131,7 +131,11 @@ app.post("/api/bookings", async (req, res) => {
 
     await booking.save();
 
-    await transporter.sendMail({
+    // ✅ SEND RESPONSE IMMEDIATELY (ONLY ONCE)
+    res.status(201).json({ message: "Booking successful" });
+
+    // ✅ SEND EMAILS IN BACKGROUND (NO await)
+    transporter.sendMail({
       from: `"Nova's Auto Center" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Booking Confirmation - Nova's Auto Center",
@@ -143,9 +147,9 @@ app.post("/api/bookings", async (req, res) => {
         <br />
         <p>— Nova's Auto Center</p>
       `,
-    });
+    }).catch(err => console.error("Customer email error:", err));
 
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Nova's Auto Center" <${process.env.EMAIL_USER}>`,
       to: process.env.ADMIN_EMAIL,
       subject: "New Booking Received",
@@ -158,9 +162,8 @@ app.post("/api/bookings", async (req, res) => {
         <p><strong>Date:</strong> ${date}</p>
         <p><strong>Message:</strong> ${message || "N/A"}</p>
       `,
-    });
+    }).catch(err => console.error("Admin email error:", err));
 
-    res.status(201).json({ message: "Booking successful" });
   } catch (error) {
     console.error("❌ Booking error:", error);
     res.status(500).json({ message: "Server error" });
