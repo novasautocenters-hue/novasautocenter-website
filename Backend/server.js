@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+const path = require("path");
 
 const app = express();
 
@@ -12,7 +13,7 @@ const app = express();
 ====================== */
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 /* ======================
    MONGODB CONNECTION
@@ -260,6 +261,13 @@ app.delete("/api/bookings/:id", verifyToken, async (req, res) => {
 ====================== */
 app.get("/health", (req, res) => {
   res.json({ status: "Server is running properly" });
+});
+
+/* ======================
+   SERVE FRONTEND (IMPORTANT)
+====================== */
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 /* ======================
