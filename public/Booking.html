@@ -175,7 +175,7 @@ form.addEventListener("submit", async (e) => {
   status.innerText = "Submitting booking...";
 
   try {
-    const res = await fetch("/api/bookings", {
+    const res = await fetch("https://novasautocenter-api.onrender.com/api/bookings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
